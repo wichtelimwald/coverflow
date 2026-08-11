@@ -42,8 +42,12 @@ jobs:
       - name: Setup Swift (Linux only)
         if: runner.os == 'Linux'
         uses: swift-actions/setup-swift@v2
-        with:
-          swift-version: "5.9"
+        # No pinned swift-version: 5.9 doesn't have a published toolchain for
+        # current ubuntu-latest, so the action 404s before any job runs
+        # (found 2026-08-12 — this Linux leg had never actually run before,
+        # since the hashFiles bug above invalidated the whole workflow file
+        # from day one). Omitting the input installs the latest available
+        # toolchain, which is what actually has a build for this runner.
 
       - name: swift build
         run: swift build -v

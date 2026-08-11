@@ -1,0 +1,20 @@
+# SwiftLint configuration for CoverFlow.
+#
+# The default rule set is too strict for this package's geometry/animation
+# code: single-letter locals (a, b, c, d, dx, dy, i, ...) are the clearest
+# names for the math involved, and CoverFlow's main view struct is a single
+# cohesive ~470-line component that isn't naturally splittable without hurting
+# readability. Found 2026-08-12 when CI ran SwiftLint against this code for
+# the first time ever (previously masked by an invalid workflow file).
+
+identifier_name:
+  min_length: 1
+  max_length: 60
+
+type_body_length:
+  warning: 450
+  error: 550
+
+excluded:
+  - .build
+  - Package.swift
