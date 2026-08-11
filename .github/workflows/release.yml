@@ -1,0 +1,50 @@
+name: Release
+
+on:
+  push:
+    tags: ['v*.*.*']
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Create GitHub Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Compute previous tag
+        id: prev
+        run: |
+          CURRENT="${GITHUB_REF_NAME}"
+          PREV=$(git tag --sort=-version:refname | grep -v "^${CURRENT}$" | head -n1 || true)
+          echo "current=${CURRENT}" >> "$GITHUB_OUTPUT"
+          echo "previous=${PREV}"   >> "$GITHUB_OUTPUT"
+
+      - name: Generate changelog
+        id: changelog
+        run: |
+          {
+            echo "## CoverFlow ${{ steps.prev.outputs.current }}"
+            echo
+            if [ -n "${{ steps.prev.outputs.previous }}" ]; then
+              echo "Changes since ${{ steps.prev.outputs.previous }}:"
+              echo
+              git log --pretty=format:'- %s (%h)' "${{ steps.prev.outputs.previous }}..${{ steps.prev.outputs.current }}"
+            else
+              echo "First standalone release."
+            fi
+          } > RELEASE_NOTES.md
+          cat RELEASE_NOTES.md
+
+      - name: Create release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: ${{ steps.prev.outputs.current }}
+          body_path: RELEASE_NOTES.md
+          draft: false
+          prerelease: false

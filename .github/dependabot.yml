@@ -1,0 +1,46 @@
+version: 2
+
+updates:
+  # ── GitHub Actions ────────────────────────────────────────────────────────
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "infra"
+
+  # ── Swift Package – template-project ─────────────────────────────────────
+  - package-ecosystem: "swift"
+    directory: "/template-project"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "template-project"
+
+  # ── Swift Package – toogether ─────────────────────────────────────────────
+  - package-ecosystem: "swift"
+    directory: "/toogether"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "toogether"
+
+  # ── Swift Package – toogether-app ────────────────────────────────────────
+  - package-ecosystem: "swift"
+    directory: "/toogether-app"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "toogether-app"

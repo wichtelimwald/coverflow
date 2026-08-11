@@ -1,0 +1,65 @@
+name: Swift CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-test:
+    name: Build & Test (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-15, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Select latest Xcode (macOS only)
+        if: runner.os == 'macOS'
+        run: |
+          LATEST_XCODE=$(ls -d /Applications/Xcode*.app 2>/dev/null | sort -V | tail -1)
+          if [ -n "$LATEST_XCODE" ]; then
+            echo "Using $LATEST_XCODE"
+            sudo xcode-select -s "$LATEST_XCODE"
+          fi
+          xcodebuild -version || true
+          swift --version
+
+      - name: Setup Swift (Linux only)
+        if: runner.os == 'Linux'
+        uses: swift-actions/setup-swift@v2
+        with:
+          swift-version: "5.9"
+
+      - name: swift build
+        run: swift build -v
+
+      - name: swift test
+        run: swift test -v
+
+  swiftlint:
+    name: SwiftLint
+    runs-on: macos-14
+    permissions:
+      contents: read
+    if: ${{ hashFiles('.swiftlint.yml') != '' }}
+    steps:
+      - uses: actions/checkout@v6
+      - name: Install SwiftLint
+        run: brew install swiftlint
+      - name: Run SwiftLint
+        run: swiftlint lint --reporter github-actions-logging .
