@@ -56,10 +56,16 @@ jobs:
     runs-on: macos-14
     permissions:
       contents: read
-    if: ${{ hashFiles('.swiftlint.yml') != '' }}
     steps:
       - uses: actions/checkout@v6
       - name: Install SwiftLint
         run: brew install swiftlint
       - name: Run SwiftLint
+        # No `if: hashFiles(...)` guard here on purpose: hashFiles() is not a
+        # recognized function in a job-level `if:` (no checkout has happened
+        # yet at that point) and using it there invalidates the ENTIRE
+        # workflow file (0 jobs scheduled, immediate failure on every push —
+        # found 2026-08-12 after it had been silently red on every push to
+        # wichtelimwald/shared-ui since 2026-05-31). SwiftLint runs fine with
+        # its built-in default rules when no .swiftlint.yml is present.
         run: swiftlint lint --reporter github-actions-logging .
