@@ -47,6 +47,38 @@ final class CoverFlowKernelTests: XCTestCase {
         XCTAssertEqual(tuning.sideShiftScale, 0.06)
     }
 
+    func testCustomSpreadMovesHitTestingWithTheRenderedStack() {
+        let tuning = CoverFlowTuning(
+            scaleReduction: 0.24,
+            maxTiltAngle: 62,
+            perspective: 0.72,
+            visibleRange: 3,
+            flowHeightScale: 1.3,
+            horizontalSpreadScale: 0.27,
+            sideShiftScale: 0.06
+        )
+
+        let defaultResult = CoverFlowKernel.hitTestCardIndex(
+            tapX: 330,
+            scrollPosition: 2,
+            itemCount: 5,
+            outerWidth: 400,
+            cardWidth: 120,
+            tuning: .default
+        )
+        let spreadResult = CoverFlowKernel.hitTestCardIndex(
+            tapX: 330,
+            scrollPosition: 2,
+            itemCount: 5,
+            outerWidth: 400,
+            cardWidth: 120,
+            tuning: tuning
+        )
+
+        XCTAssertNil(defaultResult)
+        XCTAssertEqual(spreadResult, 3)
+    }
+
     func testHitTestCenterCardReturnsFocusedIndex() {
         let result = CoverFlowKernel.hitTestCardIndex(
             tapX: 200,
