@@ -69,8 +69,8 @@ public struct CoverFlowKernel: Equatable, Sendable {
             let clampedOffset = min(max(normalizedOffset, -1), 1)
             let absOffset = abs(clampedOffset)
 
-            let baseX = atan(d) * outerWidth * CoverFlowLayoutStyle.baseStackTightness
-            let xShift = clampedOffset * outerWidth * CoverFlowLayoutStyle.baseSideShiftScale
+            let baseX = atan(d) * outerWidth * tuning.horizontalSpreadScale
+            let xShift = clampedOffset * outerWidth * tuning.sideShiftScale
             let scale = 1 - (absOffset * tuning.scaleReduction)
             let scaledHalfCard = cardWidth * scale / 2
             let rawCenterX = outerWidth / 2 + baseX + xShift
