@@ -28,6 +28,25 @@ final class CoverFlowKernelTests: XCTestCase {
 
     private var defaultTuning: CoverFlowTuning { .default }
 
+    func testDefaultTuningPreservesLegacyHorizontalSpread() {
+        XCTAssertEqual(CoverFlowTuning.default.horizontalSpreadScale, CoverFlowLayoutStyle.baseStackTightness)
+        XCTAssertEqual(CoverFlowTuning.default.sideShiftScale, CoverFlowLayoutStyle.baseSideShiftScale)
+    }
+
+    func testCustomHorizontalSpreadIsStored() {
+        let tuning = CoverFlowTuning(
+            scaleReduction: 0.24,
+            maxTiltAngle: 62,
+            perspective: 0.72,
+            visibleRange: 3,
+            flowHeightScale: 1.3,
+            horizontalSpreadScale: 0.27,
+            sideShiftScale: 0.06
+        )
+        XCTAssertEqual(tuning.horizontalSpreadScale, 0.27)
+        XCTAssertEqual(tuning.sideShiftScale, 0.06)
+    }
+
     func testHitTestCenterCardReturnsFocusedIndex() {
         let result = CoverFlowKernel.hitTestCardIndex(
             tapX: 200,
