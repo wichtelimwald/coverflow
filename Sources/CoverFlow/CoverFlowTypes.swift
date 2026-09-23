@@ -14,19 +14,29 @@ public struct CoverFlowTuning: Equatable, Sendable {
     public let perspective: CGFloat
     public let visibleRange: CGFloat
     public let flowHeightScale: CGFloat
+    /// Horizontal spread used by the atan-compressed stack position.
+    /// Defaults to the legacy engine constant so existing consumers do not move.
+    public let horizontalSpreadScale: CGFloat
+    /// Additional linear side shift applied as cards recede from the centre.
+    /// Defaults to the legacy engine constant so existing consumers do not move.
+    public let sideShiftScale: CGFloat
 
     public init(
         scaleReduction: CGFloat,
         maxTiltAngle: CGFloat,
         perspective: CGFloat,
         visibleRange: CGFloat,
-        flowHeightScale: CGFloat
+        flowHeightScale: CGFloat,
+        horizontalSpreadScale: CGFloat = CoverFlowLayoutStyle.baseStackTightness,
+        sideShiftScale: CGFloat = CoverFlowLayoutStyle.baseSideShiftScale
     ) {
         self.scaleReduction = scaleReduction
         self.maxTiltAngle = maxTiltAngle
         self.perspective = perspective
         self.visibleRange = visibleRange
         self.flowHeightScale = flowHeightScale
+        self.horizontalSpreadScale = horizontalSpreadScale
+        self.sideShiftScale = sideShiftScale
     }
 
     public static let `default` = CoverFlowTuning(
