@@ -454,10 +454,10 @@ public struct CoverFlow<Item: Identifiable, Card: View>: View {
         let normalizedOffset = d / tuning.visibleRange
         let clampedOffset = min(max(normalizedOffset, CoverFlowLayoutStyle.normalizedClampMin), CoverFlowLayoutStyle.normalizedClampMax)
         let absOffset = abs(clampedOffset)
-        let baseX = atan(d) * outerSize.width * CoverFlowLayoutStyle.baseStackTightness
+        let baseX = atan(d) * outerSize.width * tuning.horizontalSpreadScale
         let tilt = -clampedOffset * tuning.maxTiltAngle
         let scale = 1 - (absOffset * tuning.scaleReduction)
-        let xShift = clampedOffset * outerSize.width * CoverFlowLayoutStyle.baseSideShiftScale
+        let xShift = clampedOffset * outerSize.width * tuning.sideShiftScale
         let yShift = absOffset * cardSize.height * CoverFlowLayoutStyle.sideDropScale
         let depthIndex = Double(CoverFlowLayoutStyle.depthIndexBase) - Double(abs(d))
         let rawCenterX = outerSize.width / CoverFlowLayoutStyle.centerDivider + baseX + xShift
