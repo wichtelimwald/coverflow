@@ -454,15 +454,24 @@ public struct CoverFlow<Item: Identifiable, Card: View>: View {
         let normalizedOffset = d / tuning.visibleRange
         let clampedOffset = min(max(normalizedOffset, CoverFlowLayoutStyle.normalizedClampMin), CoverFlowLayoutStyle.normalizedClampMax)
         let absOffset = abs(clampedOffset)
-        let baseX = atan(d) * outerSize.width * tuning.horizontalSpreadScale
+        let baseX = atan(d) * outerSize.width * CoverFlowLayoutStyle.baseStackTightness
         let tilt = -clampedOffset * tuning.maxTiltAngle
         let scale = 1 - (absOffset * tuning.scaleReduction)
-        let xShift = clampedOffset * outerSize.width * tuning.sideShiftScale
+        let xShift = clampedOffset * outerSize.width * CoverFlowLayoutStyle.baseSideShiftScale
+        let fanSteps = max(abs(d) - 1, 0)
+        let fanDirection: CGFloat = d == 0 ? 0 : (d > 0 ? 1 : -1)
+        let fanX = fanDirection * fanSteps * fanSteps * outerSize.width * tuning.fanOutScale
         let yShift = absOffset * cardSize.height * CoverFlowLayoutStyle.sideDropScale
         let depthIndex = Double(CoverFlowLayoutStyle.depthIndexBase) - Double(abs(d))
-        let rawCenterX = outerSize.width / CoverFlowLayoutStyle.centerDivider + baseX + xShift
+        let rawCenterX = outerSize.width / CoverFlowLayoutStyle.centerDivider + baseX + xShift + fanX
         let scaledHalfCard = cardSize.width * scale / CoverFlowLayoutStyle.centerDivider
-        let centerX = min(max(rawCenterX, scaledHalfCard), outerSize.width - scaledHalfCard)
+        let tiltRadians = abs(tilt) * .pi / 180
+        let projectedHalfCard = scaledHalfCard * cos(tiltRadians)
+        // Preserve the legacy edge clamp unless fan-out is explicitly enabled.
+        // A fanned stack may use the narrower projected width of a rotated card,
+        // allowing farther cards to peek out without changing existing consumers.
+        let edgeHalfCard = tuning.fanOutScale == 0 ? scaledHalfCard : projectedHalfCard
+        let centerX = min(max(rawCenterX, edgeHalfCard), outerSize.width - edgeHalfCard)
         let position = CGPoint(
             x: centerX,
             y: outerSize.height / CoverFlowLayoutStyle.centerDivider + yShift
