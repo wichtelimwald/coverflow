@@ -28,55 +28,42 @@ final class CoverFlowKernelTests: XCTestCase {
 
     private var defaultTuning: CoverFlowTuning { .default }
 
-    func testDefaultTuningPreservesLegacyHorizontalSpread() {
-        XCTAssertEqual(CoverFlowTuning.default.horizontalSpreadScale, CoverFlowLayoutStyle.baseStackTightness)
-        XCTAssertEqual(CoverFlowTuning.default.sideShiftScale, CoverFlowLayoutStyle.baseSideShiftScale)
+    func testDefaultTuningPreservesLegacyStack() {
+        XCTAssertEqual(CoverFlowTuning.default.fanOutScale, 0)
     }
 
-    func testCustomHorizontalSpreadIsStored() {
+    func testCustomFanOutIsStored() {
         let tuning = CoverFlowTuning(
             scaleReduction: 0.24,
             maxTiltAngle: 62,
             perspective: 0.72,
             visibleRange: 3,
             flowHeightScale: 1.3,
-            horizontalSpreadScale: 0.27,
-            sideShiftScale: 0.06
+            fanOutScale: 0.04
         )
-        XCTAssertEqual(tuning.horizontalSpreadScale, 0.27)
-        XCTAssertEqual(tuning.sideShiftScale, 0.06)
+        XCTAssertEqual(tuning.fanOutScale, 0.04)
     }
 
-    func testCustomSpreadMovesHitTestingWithTheRenderedStack() {
+    func testFanOutKeepsFartherSideCardReachable() {
         let tuning = CoverFlowTuning(
             scaleReduction: 0.24,
             maxTiltAngle: 62,
             perspective: 0.72,
             visibleRange: 3,
             flowHeightScale: 1.3,
-            horizontalSpreadScale: 0.27,
-            sideShiftScale: 0.06
+            fanOutScale: 0.04
         )
 
-        let defaultResult = CoverFlowKernel.hitTestCardIndex(
-            tapX: 330,
-            scrollPosition: 2,
+        let result = CoverFlowKernel.hitTestCardIndex(
+            tapX: 390,
+            scrollPosition: 1,
             itemCount: 5,
             outerWidth: 400,
-            cardWidth: 120,
-            tuning: .default
-        )
-        let spreadResult = CoverFlowKernel.hitTestCardIndex(
-            tapX: 330,
-            scrollPosition: 2,
-            itemCount: 5,
-            outerWidth: 400,
-            cardWidth: 120,
+            cardWidth: 225,
             tuning: tuning
         )
 
-        XCTAssertNil(defaultResult)
-        XCTAssertEqual(spreadResult, 3)
+        XCTAssertEqual(result, 3, "second card to the right should visibly peek out and remain tappable")
     }
 
     func testHitTestCenterCardReturnsFocusedIndex() {
