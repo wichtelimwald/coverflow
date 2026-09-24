@@ -63,7 +63,7 @@ final class CoverFlowKernelTests: XCTestCase {
             tuning: tuning
         )
 
-        XCTAssertEqual(result, 3, "second card to the right should visibly peek out and remain tappable")
+        XCTAssertEqual(result, 4, "a farther card should visibly peek out beyond the nearer side cards and remain tappable")
     }
 
     func testHitTestCenterCardReturnsFocusedIndex() {
