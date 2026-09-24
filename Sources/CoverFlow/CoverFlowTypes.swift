@@ -14,19 +14,25 @@ public struct CoverFlowTuning: Equatable, Sendable {
     public let perspective: CGFloat
     public let visibleRange: CGFloat
     public let flowHeightScale: CGFloat
+    /// Progressive extra spread for cards beyond the immediate neighbour.
+    /// Zero preserves the legacy stack exactly. Positive values fan farther
+    /// cards toward the edges so more than three cards can remain visible.
+    public let fanOutScale: CGFloat
 
     public init(
         scaleReduction: CGFloat,
         maxTiltAngle: CGFloat,
         perspective: CGFloat,
         visibleRange: CGFloat,
-        flowHeightScale: CGFloat
+        flowHeightScale: CGFloat,
+        fanOutScale: CGFloat = 0
     ) {
         self.scaleReduction = scaleReduction
         self.maxTiltAngle = maxTiltAngle
         self.perspective = perspective
         self.visibleRange = visibleRange
         self.flowHeightScale = flowHeightScale
+        self.fanOutScale = fanOutScale
     }
 
     public static let `default` = CoverFlowTuning(

@@ -28,6 +28,44 @@ final class CoverFlowKernelTests: XCTestCase {
 
     private var defaultTuning: CoverFlowTuning { .default }
 
+    func testDefaultTuningPreservesLegacyStack() {
+        XCTAssertEqual(CoverFlowTuning.default.fanOutScale, 0)
+    }
+
+    func testCustomFanOutIsStored() {
+        let tuning = CoverFlowTuning(
+            scaleReduction: 0.24,
+            maxTiltAngle: 62,
+            perspective: 0.72,
+            visibleRange: 3,
+            flowHeightScale: 1.3,
+            fanOutScale: 0.04
+        )
+        XCTAssertEqual(tuning.fanOutScale, 0.04)
+    }
+
+    func testFanOutKeepsFartherSideCardReachable() {
+        let tuning = CoverFlowTuning(
+            scaleReduction: 0.24,
+            maxTiltAngle: 62,
+            perspective: 0.72,
+            visibleRange: 3,
+            flowHeightScale: 1.3,
+            fanOutScale: 0.04
+        )
+
+        let result = CoverFlowKernel.hitTestCardIndex(
+            tapX: 390,
+            scrollPosition: 1,
+            itemCount: 5,
+            outerWidth: 400,
+            cardWidth: 225,
+            tuning: tuning
+        )
+
+        XCTAssertEqual(result, 4, "a farther card should visibly peek out beyond the nearer side cards and remain tappable")
+    }
+
     func testHitTestCenterCardReturnsFocusedIndex() {
         let result = CoverFlowKernel.hitTestCardIndex(
             tapX: 200,

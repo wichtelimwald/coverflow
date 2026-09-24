@@ -71,13 +71,16 @@ public struct CoverFlowKernel: Equatable, Sendable {
 
             let baseX = atan(d) * outerWidth * CoverFlowLayoutStyle.baseStackTightness
             let xShift = clampedOffset * outerWidth * CoverFlowLayoutStyle.baseSideShiftScale
+            let fanSteps = max(abs(d) - 1, 0)
+            let fanDirection: CGFloat = d == 0 ? 0 : (d > 0 ? 1 : -1)
+            let fanX = fanDirection * fanSteps * fanSteps * outerWidth * tuning.fanOutScale
             let scale = 1 - (absOffset * tuning.scaleReduction)
             let scaledHalfCard = cardWidth * scale / 2
-            let rawCenterX = outerWidth / 2 + baseX + xShift
-            let centerX = min(max(rawCenterX, scaledHalfCard), outerWidth - scaledHalfCard)
-
             let tiltRad = abs(clampedOffset * tuning.maxTiltAngle) * .pi / 180
-            let visibleHalfWidth = cardWidth * scale * cos(tiltRad) / 2
+            let visibleHalfWidth = scaledHalfCard * cos(tiltRad)
+            let edgeHalfCard = tuning.fanOutScale == 0 ? scaledHalfCard : visibleHalfWidth
+            let rawCenterX = outerWidth / 2 + baseX + xShift + fanX
+            let centerX = min(max(rawCenterX, edgeHalfCard), outerWidth - edgeHalfCard)
 
             guard tapX >= centerX - visibleHalfWidth && tapX <= centerX + visibleHalfWidth else {
                 continue
